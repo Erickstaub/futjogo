@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:futjogo/jogo.dart';
+import 'package:intl/intl.dart';
 
 class Detalhejogo extends StatefulWidget {
   final Jogo jogo;
@@ -41,29 +42,21 @@ class _DetalhejogoState extends State<Detalhejogo> {
         .map((item) => item['profiles']['nome'] as String)
         .toList();
 
-    jaEstaNoJogo =
-        lista.any((item) => item['usuario_id'] == user!.id);
+    jaEstaNoJogo = lista.any((item) => item['usuario_id'] == user!.id);
 
-    setState(() {
-      carregando = false;
-    });
+    if (mounted) {
+      setState(() {
+        carregando = false;
+      });
+    }
   }
 
   Future<void> entrarNoJogo() async {
     final user = _supabase.auth.currentUser;
 
-    // 🔴 Regra 1: não pode estar cheio
     if (jogadores.length >= widget.jogo.limiteJogadores) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Jogo já está lotado ⚠️")),
-      );
-      return;
-    }
-
-    // 🔴 Regra 2: não pode entrar duas vezes
-    if (jaEstaNoJogo) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Você já está nesse jogo ⚽")),
       );
       return;
     }
@@ -92,64 +85,130 @@ class _DetalhejogoState extends State<Detalhejogo> {
   Widget build(BuildContext context) {
     if (carregando) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: Color(0xFF0A2A12),
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       );
     }
 
+    final horarioFormatado = DateFormat('dd/MM/yyyy - HH:mm').format(widget.jogo.horario);
+
     return Scaffold(
+      backgroundColor: const Color(0xFF0A2A12),
       appBar: AppBar(
-        title: Text(widget.jogo.nome),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(widget.jogo.nome, style: const TextStyle(color: Colors.white)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("📍 Local: ${widget.jogo.localizacao}"),
-            const SizedBox(height: 8),
-            Text("🕒 Horário: ${widget.jogo.horario}"),
-            const SizedBox(height: 8),
-            Text(
-                "👥 ${jogadores.length}/${widget.jogo.limiteJogadores} jogadores"),
-            const SizedBox(height: 20),
-
-            const Text(
-              "Jogadores confirmados:",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-
-            Expanded(
-              child: jogadores.isEmpty
-                  ? const Text("Ninguém confirmou ainda 😢")
-                  : ListView.builder(
-                      itemCount: jogadores.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          leading: const Icon(Icons.person),
-                          title: Text(jogadores[index]),
-                        );
-                      },
-                    ),
-            ),
-
-            const SizedBox(height: 10),
-
-            SizedBox(
+      body: Column(
+        children: [
+          // Card de Informações do Jogo
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: jaEstaNoJogo ? sairDoJogo : entrarNoJogo,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      jaEstaNoJogo ? Colors.red : Colors.green,
-                ),
-                child: Text(
-                  jaEstaNoJogo ? "Sair do jogo" : "Entrar no jogo",
-                ),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Text("Local: ${widget.jogo.localizacao}", 
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time_filled, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Text("Horário: $horarioFormatado", 
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.groups, color: Colors.green),
+                      const SizedBox(width: 8),
+                      Text("Confirmados: ${jogadores.length}/${widget.jogo.limiteJogadores}", 
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Lista de Jogadores
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 10),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20, bottom: 10),
+                    child: Text(
+                      "LISTA DE CONFIRMADOS",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
+                    ),
+                  ),
+                  Expanded(
+                    child: jogadores.isEmpty
+                        ? const Center(child: Text("Ninguém confirmou ainda 😢"))
+                        : ListView.builder(
+                            itemCount: jogadores.length,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                leading: const CircleAvatar(
+                                  backgroundColor: Color(0xFFF0F0F0),
+                                  child: Icon(Icons.person, color: Colors.green),
+                                ),
+                                title: Text(jogadores[index], 
+                                  style: const TextStyle(fontWeight: FontWeight.w600)),
+                                trailing: const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                              );
+                            },
+                          ),
+                  ),
+                  
+                  // Botão de Ação
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: jaEstaNoJogo ? sairDoJogo : entrarNoJogo,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: jaEstaNoJogo ? Colors.redAccent : const Color(0xFF1DB954),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          jaEstaNoJogo ? "SAIR DA PARTIDA" : "CONFIRMAR PRESENÇA",
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
