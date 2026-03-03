@@ -47,13 +47,13 @@ class _CompartilharState extends State<Compartilhar> {
 Future<void> abrirModalConvites() async {
   final currentUser = _supabase.auth.currentUser;
 
-  // 🔹 Todos usuários menos eu
+ 
   final usuarios = await _supabase
       .from('profiles')
       .select()
       .neq('id', currentUser!.id);
 
-  // 🔹 Buscar quem já está no jogo
+
   final jogadoresData = await _supabase
       .from('jogadores_jogo')
       .select('usuario_id')
@@ -62,7 +62,7 @@ Future<void> abrirModalConvites() async {
   final jogadoresIds =
       (jogadoresData as List).map((e) => e['usuario_id']).toSet();
 
-  // 🔹 Buscar convites pendentes desse jogo
+
   final convitesData = await _supabase
       .from('convites')
       .select('destinatario')
@@ -170,7 +170,7 @@ Future<void> enviarConvite(String destinatarioId) async {
       ),
       body: Column(
         children: [
-          // Card de resumo do jogo
+      
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
@@ -195,7 +195,7 @@ Future<void> enviarConvite(String destinatarioId) async {
             ),
           ),
 
-          // Lista de Jogadores (A Prancheta)
+          
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
@@ -230,7 +230,7 @@ Future<void> enviarConvite(String destinatarioId) async {
                           ),
                   ),
                   
-                  // Botão de Compartilhar
+              
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: SizedBox(

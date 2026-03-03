@@ -35,7 +35,7 @@ class _TelajogosState extends State<Telajogos> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Mantendo o padrão Verde Escuro
+     
       backgroundColor: const Color(0xFF0A2A12),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -47,14 +47,14 @@ class _TelajogosState extends State<Telajogos> {
         ),
       ),
       
-      // Botão Flutuante Estilizado (Verde Vibrante)
+    
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF1DB954),
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const Criarjogo()),
-          ).then((_) => carregarJogos()); // Recarrega ao voltar
+          ).then((_) => carregarJogos()); 
         },
         child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),

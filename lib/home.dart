@@ -120,13 +120,13 @@ class _HomeState extends State<Home> {
 Future<void> aceitarConvite(Map<String, dynamic> convite) async {
   final user = _supabase.auth.currentUser;
 
-  // 1️⃣ adiciona no jogo
+  
   await _supabase.from('jogadores_jogo').insert({
     'jogo_id': convite['jogo_id'],
     'usuario_id': user!.id,
   });
 
-  // 2️⃣ atualiza status
+
   await _supabase
       .from('convites')
       .update({'status': 'aceito'})
@@ -144,7 +144,7 @@ Future<void> recusarConvite(String conviteId) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Fundo verde escuro para combinar com o Login
+     
       backgroundColor: const Color(0xFF0A2A12),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -270,7 +270,7 @@ Future<void> recusarConvite(String conviteId) async {
                         ),
                 ),
                 
-                // Botão inferior estilizado
+               
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: const BoxDecoration(

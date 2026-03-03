@@ -38,7 +38,7 @@ class _CriarjogoState extends State<Criarjogo> {
 
       if (user == null) return;
 
-      // 1. Criar o jogo e retornar o ID
+ 
       final novoJogo = await supabase
           .from('jogos')
           .insert({
@@ -53,7 +53,7 @@ class _CriarjogoState extends State<Criarjogo> {
 
       final jogoId = novoJogo['id'];
 
-      // 2. Inserir o criador automaticamente como jogador
+
       await supabase.from('jogadores_jogo').insert({
         'jogo_id': jogoId,
         'usuario_id': user.id,
@@ -82,7 +82,7 @@ class _CriarjogoState extends State<Criarjogo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A2A12), // Verde escuro padrão
+      backgroundColor: const Color(0xFF0A2A12), 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -97,7 +97,7 @@ class _CriarjogoState extends State<Criarjogo> {
               const Icon(Icons.add_location_alt_rounded, size: 60, color: Colors.white),
               const SizedBox(height: 20),
               
-              // Container Branco (Modal)
+            
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(

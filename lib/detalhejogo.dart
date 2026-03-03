@@ -102,7 +102,7 @@ class _DetalhejogoState extends State<Detalhejogo> {
       ),
       body: Column(
         children: [
-          // Card de Informações do Jogo
+         
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
@@ -146,7 +146,7 @@ class _DetalhejogoState extends State<Detalhejogo> {
             ),
           ),
 
-          // Lista de Jogadores
+         
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 10),
@@ -182,8 +182,7 @@ class _DetalhejogoState extends State<Detalhejogo> {
                             },
                           ),
                   ),
-                  
-                  // Botão de Ação
+      
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: SizedBox(

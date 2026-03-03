@@ -71,7 +71,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Fundo Verde Escuro (Estilo Gramado Noturno)
+  
       backgroundColor: const Color(0xFF0A2A12),
       body: Center(
         child: SingleChildScrollView(
@@ -79,7 +79,7 @@ class _LoginState extends State<Login> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo ou Ícone do App
+             
               const Icon(Icons.sports_soccer, size: 100, color: Colors.white),
               const SizedBox(height: 10),
               const Text(
@@ -93,7 +93,7 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 40),
 
-              // Modal Branco (Container Central)
+             
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -122,7 +122,7 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 25),
 
-                      // Campo de Email
+                  
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -142,7 +142,6 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Campo de Senha
                       TextFormField(
                         controller: _passwordController,
                         obscureText: true,
@@ -162,14 +161,14 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 30),
 
-                      // Botão de Login
+            
                       SizedBox(
                         width: double.infinity,
                         height: 55,
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1DB954), // Verde vibrante
+                            backgroundColor: const Color(0xFF1DB954), 
                             foregroundColor: Colors.white,
                             elevation: 2,
                             shape: RoundedRectangleBorder(
@@ -194,7 +193,7 @@ class _LoginState extends State<Login> {
 
               const SizedBox(height: 30),
 
-              // Botão para Criar Conta
+           
               TextButton(
                 onPressed: () {
                   Navigator.push(

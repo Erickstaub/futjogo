@@ -30,10 +30,10 @@ class _CriarusuarioState extends State<Criarusuario> {
       final user = response.user;
 
       if (user != null) {
-        // Insere o perfil na tabela 'profiles'
+       
         await supabase.from('profiles').insert({
           'id': user.id,
-          'nome': _emailController.text.split('@')[0], // nome provisório
+          'nome': _emailController.text.split('@')[0], 
         });
       }
 
@@ -44,7 +44,7 @@ class _CriarusuarioState extends State<Criarusuario> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pop(context); // Volta para a tela de Login
+        Navigator.pop(context); 
       }
     } on AuthException catch (e) {
       if (mounted) {
@@ -73,7 +73,7 @@ class _CriarusuarioState extends State<Criarusuario> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Fundo Verde Escuro consistente com o Login
+      
       backgroundColor: const Color(0xFF0A2A12),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -99,7 +99,7 @@ class _CriarusuarioState extends State<Criarusuario> {
               ),
               const SizedBox(height: 30),
 
-              // Modal Branco do Formulário
+             
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -123,7 +123,7 @@ class _CriarusuarioState extends State<Criarusuario> {
                       ),
                       const SizedBox(height: 20),
                       
-                      // Campo de Email
+                   
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -137,7 +137,7 @@ class _CriarusuarioState extends State<Criarusuario> {
                       ),
                       const SizedBox(height: 16),
                       
-                      // Campo de Senha
+                   
                       TextFormField(
                         controller: _passwordController,
                         obscureText: true,
@@ -151,7 +151,7 @@ class _CriarusuarioState extends State<Criarusuario> {
                       ),
                       const SizedBox(height: 24),
                       
-                      // Botão Criar
+                  
                       SizedBox(
                         width: double.infinity,
                         height: 55,
