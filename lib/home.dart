@@ -40,6 +40,106 @@ class _HomeState extends State<Home> {
       carregando = false;
     });
   }
+  Future<void> abrirNotificacoes() async {
+  final user = _supabase.auth.currentUser;
+  if (user == null) return;
+
+  final data = await _supabase
+      .from('convites')
+      .select('*, jogos(nome, localizacao, horario)')
+      .eq('destinatario', user.id)
+      .eq('status', 'pendente');
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    ),
+    builder: (context) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.75,
+        child: Column(
+          children: [
+            const SizedBox(height: 15),
+            const Text(
+              "Minhas Notificações",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+
+            Expanded(
+              child: data.isEmpty
+                  ? const Center(child: Text("Nenhum convite pendente ⚽"))
+                  : ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        final convite = data[index];
+                        final jogo = convite['jogos'];
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          child: ListTile(
+                            title: Text(jogo['nome'] ?? ''),
+                            subtitle:
+                                Text(jogo['localizacao'] ?? ''),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.check,
+                                      color: Colors.green),
+                                  onPressed: () async {
+                                    await aceitarConvite(convite);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close,
+                                      color: Colors.red),
+                                  onPressed: () async {
+                                    await recusarConvite(convite['id']);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+Future<void> aceitarConvite(Map<String, dynamic> convite) async {
+  final user = _supabase.auth.currentUser;
+
+  // 1️⃣ adiciona no jogo
+  await _supabase.from('jogadores_jogo').insert({
+    'jogo_id': convite['jogo_id'],
+    'usuario_id': user!.id,
+  });
+
+  // 2️⃣ atualiza status
+  await _supabase
+      .from('convites')
+      .update({'status': 'aceito'})
+      .eq('id', convite['id']);
+
+  carregarJogos();
+}
+Future<void> recusarConvite(String conviteId) async {
+  await _supabase
+      .from('convites')
+      .update({'status': 'recusado'})
+      .eq('id', conviteId);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +172,12 @@ class _HomeState extends State<Home> {
               carregarJogos();
             },
           ),
+          IconButton(
+  icon: const Icon(Icons.notifications, color: Colors.white),
+  onPressed: () {
+    abrirNotificacoes();
+  },
+),
         ],
       ),
       body: carregando

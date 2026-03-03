@@ -18,6 +18,7 @@ class Compartilhar extends StatefulWidget {
 class _CompartilharState extends State<Compartilhar> {
   final _supabase = Supabase.instance.client;
 
+
   List<String> jogadores = [];
   bool carregando = true;
 
@@ -43,6 +44,110 @@ class _CompartilharState extends State<Compartilhar> {
     });
   }
 
+Future<void> abrirModalConvites() async {
+  final currentUser = _supabase.auth.currentUser;
+
+  // 🔹 Todos usuários menos eu
+  final usuarios = await _supabase
+      .from('profiles')
+      .select()
+      .neq('id', currentUser!.id);
+
+  // 🔹 Buscar quem já está no jogo
+  final jogadoresData = await _supabase
+      .from('jogadores_jogo')
+      .select('usuario_id')
+      .eq('jogo_id', widget.jogo.id);
+
+  final jogadoresIds =
+      (jogadoresData as List).map((e) => e['usuario_id']).toSet();
+
+  // 🔹 Buscar convites pendentes desse jogo
+  final convitesData = await _supabase
+      .from('convites')
+      .select('destinatario')
+      .eq('jogo_id', widget.jogo.id)
+      .eq('status', 'pendente');
+
+  final convidadosIds =
+      (convitesData as List).map((e) => e['destinatario']).toSet();
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+    ),
+    builder: (context) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.75,
+        child: Column(
+          children: [
+            const SizedBox(height: 15),
+            const Text(
+              "Convidar Jogadores",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+
+            Expanded(
+              child: ListView.builder(
+                itemCount: usuarios.length,
+                itemBuilder: (context, index) {
+                  final user = usuarios[index];
+                  final userId = user['id'];
+
+                  final jaEstaNoJogo = jogadoresIds.contains(userId);
+                  final jaConvidado = convidadosIds.contains(userId);
+
+                  return ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(Icons.person),
+                    ),
+                    title: Text(user['nome']),
+                    trailing: jaEstaNoJogo
+                        ? const Text(
+                            "Já está no jogo",
+                            style: TextStyle(color: Colors.grey),
+                          )
+                        : jaConvidado
+                            ? const Text(
+                                "Convite enviado",
+                                style: TextStyle(color: Colors.orange),
+                              )
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  await enviarConvite(userId);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Convidar"),
+                              ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+Future<void> enviarConvite(String destinatarioId) async {
+  final user = _supabase.auth.currentUser;
+
+  await _supabase.from('convites').insert({
+    'jogo_id': widget.jogo.id,
+    'remetente': user!.id,
+    'destinatario': destinatarioId,
+  });
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text("Convite enviado ⚽")),
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     if (carregando) {
@@ -61,6 +166,7 @@ class _CompartilharState extends State<Compartilhar> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text("Compartilhar Jogo", style: TextStyle(color: Colors.white)),
+      
       ),
       body: Column(
         children: [
@@ -131,10 +237,9 @@ class _CompartilharState extends State<Compartilhar> {
                       width: double.infinity,
                       height: 55,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          // Aqui você pode implementar a lógica de copiar para o clipboard ou abrir o share
-                          print("Gerando lista para o WhatsApp...");
-                        },
+                        onPressed: () async{
+      abrirModalConvites();
+    },
                         icon: const Icon(Icons.share),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1DB954),
@@ -143,7 +248,7 @@ class _CompartilharState extends State<Compartilhar> {
                           elevation: 0,
                         ),
                         label: const Text(
-                          "COMPARTILHAR NO WHATSAPP",
+                          "COMPARTILHAR",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
